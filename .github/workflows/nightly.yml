@@ -85,7 +85,7 @@ jobs:
     - name: Store rust version
       shell: bash
       run: |
-        docker run eranrund/muslrust:@${{ steps.build.outputs.digest }} rustc --version
+        docker run eranrund/muslrust@${{ steps.build.outputs.digest }} rustc --version
         RUST_VER="$(docker run eranrund/muslrust:@${{ steps.build.outputs.digest }} rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
         echo $RUST_VER > /tmp/rust-version
        
