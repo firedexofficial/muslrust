@@ -82,18 +82,18 @@ jobs:
         if-no-files-found: error
         retention-days: 1
 
-    - name: Compute tags
-      shell: bash
-      run: |
-        #docker run eranrund/muslrust:temp rustc --version
-        docker image tag eranrund/muslrust@${{ steps.build.outputs.digest }} eranrund/muslrust:temp
-        docker run eranrund/muslrust:@${{ steps.build.outputs.digest }} rustc --version
-        RUST_VER="$(docker run eranrund/muslrust:temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
-        RUST_DATE="$(date +"%Y-%m-%d")"
-        RUST_CHANNEL=nightly
-        echo "TAG1=eranrund/muslrust:${RUST_CHANNEL}" >> $GITHUB_ENV
-        echo "TAG2=eranrund/muslrust:${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
-        echo "TAG3=eranrund/muslrust:${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
+#     - name: Compute tags
+#       shell: bash
+#       run: |
+#         #docker run eranrund/muslrust:temp rustc --version
+#         docker image tag eranrund/muslrust@${{ steps.build.outputs.digest }} eranrund/muslrust:temp
+#         docker run eranrund/muslrust:@${{ steps.build.outputs.digest }} rustc --version
+#         RUST_VER="$(docker run eranrund/muslrust:temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
+#         RUST_DATE="$(date +"%Y-%m-%d")"
+#         RUST_CHANNEL=nightly
+#         echo "TAG1=eranrund/muslrust:${RUST_CHANNEL}" >> $GITHUB_ENV
+#         echo "TAG2=eranrund/muslrust:${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
+#         echo "TAG3=eranrund/muslrust:${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
 
 #     - name: Run tests
 #       shell: bash
