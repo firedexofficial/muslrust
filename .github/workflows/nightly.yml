@@ -69,7 +69,7 @@ jobs:
     - name: Export digest
       run: |
         mkdir -p /tmp/digests
-        digest="${{ steps.build.outputs.digest }}"
+        digest="${{ steps.docker.outputs.digest }}"
         echo "digest: $digest"
         touch "/tmp/digests/${digest#sha256:}"
     - name: Upload digest
