@@ -23,8 +23,10 @@ jobs:
         include:
           - platform: linux/amd64
             dockerfile: Dockerfile.x86_64
+            arch: amd64
           - platform: linux/arm64
             dockerfile: Dockerfile.arm64
+            arch: arm64
     steps:
     - uses: 'actions/checkout@v2'
     - uses: extractions/setup-just@v1
@@ -102,8 +104,14 @@ jobs:
       shell: bash
       run: |
         docker run --platform ${{ matrix.platform }} rustmusl-temp rustc --version
-        RUST_VER="$(docker run eranrund/muslrust@${{ steps.build.outputs.digest }} rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
+        RUST_VER="$(docker run --platform ${{ matrix.platform }} rustmusl-temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
         echo $RUST_VER > /tmp/rust-version
+
+    - name: Tag and push
+      shell: bash
+      run: |
+        docker tag rustmusl-temp ${{ env.REGISTRY_NAME }}:${{ matrix.arch }}-latest
+        docker push ${{ env.REGISTRY_NAME }}:${{ matrix.arch }}-latest
        
     - name: Upload rust version
       uses: actions/upload-artifact@v4

@@ -12,28 +12,28 @@ LABEL maintainer="Eirik Albrigtsen <sszynrae@gmail.com>"
 # - file - needed by rustup.sh install
 # - automake autoconf libtool - support crates building C deps as part cargo build
 # NB: does not include cmake atm
-# RUN apt-get update && apt-get install -y \
-#   musl-dev \
-#   musl-tools \
-#   file \
-#   git \
-#   openssh-client \
-#   make \
-#   cmake \
-#   g++ \
-#   curl \
-#   pkgconf \
-#   ca-certificates \
-#   xutils-dev \
-#   libssl-dev \
-#   libpq-dev \
-#   automake \
-#   autoconf \
-#   libtool \
-#   libprotobuf-dev \
-#   unzip \
-#   --no-install-recommends && \
-#   rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+  musl-dev \
+  musl-tools \
+  file \
+  git \
+  openssh-client \
+  make \
+  cmake \
+  g++ \
+  curl \
+  pkgconf \
+  ca-certificates \
+  xutils-dev \
+  libssl-dev \
+  libpq-dev \
+  automake \
+  autoconf \
+  libtool \
+  libprotobuf-dev \
+  unzip \
+  --no-install-recommends && \
+  rm -rf /var/lib/apt/lists/*
 
 # Install rust using rustup
 ARG CHANNEL
@@ -41,11 +41,11 @@ ENV RUSTUP_VER="1.26.0" \
     RUST_ARCH="aarch64-unknown-linux-gnu" \
     CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse
 
-# RUN curl "https://static.rust-lang.org/rustup/archive/${RUSTUP_VER}/${RUST_ARCH}/rustup-init" -o rustup-init && \
-#     chmod +x rustup-init && \
-#     ./rustup-init -y --default-toolchain ${CHANNEL} --profile minimal --no-modify-path && \
-#     rm rustup-init && \
-#     ~/.cargo/bin/rustup target add aarch64-unknown-linux-musl
+RUN curl "https://static.rust-lang.org/rustup/archive/${RUSTUP_VER}/${RUST_ARCH}/rustup-init" -o rustup-init && \
+    chmod +x rustup-init && \
+    ./rustup-init -y --default-toolchain ${CHANNEL} --profile minimal --no-modify-path && \
+    rm rustup-init && \
+    ~/.cargo/bin/rustup target add aarch64-unknown-linux-musl
 
 # Allow non-root access to cargo
 RUN chmod a+X /root
