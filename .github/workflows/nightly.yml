@@ -104,7 +104,7 @@ jobs:
     # We store them here since it makes the merge step a bit easier - it doesn't need to figure out which of the
     # architectures it can run (to extract the rust version).
     # Not the most elegant, but it works.
-     - name: Store tag info
+    - name: Store tag info
       shell: bash
       run: |
         mkdir -p /tmp/tags
