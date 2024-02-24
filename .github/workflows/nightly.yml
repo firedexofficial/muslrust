@@ -30,7 +30,7 @@ jobs:
     - uses: extractions/setup-just@v1
 
     - name: Login to DockerHub
-      if: github.event_name != 'pull_request'
+      # TODO if: github.event_name != 'pull_request'
       uses: docker/login-action@v1
       with:
         username: eranrund
