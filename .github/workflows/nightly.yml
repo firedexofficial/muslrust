@@ -82,18 +82,21 @@ jobs:
         if-no-files-found: error
         retention-days: 1
 
-#     - name: Compute tags
-#       shell: bash
-#       run: |
-#         #docker run eranrund/muslrust:temp rustc --version
-#         docker image tag eranrund/muslrust@${{ steps.build.outputs.digest }} eranrund/muslrust:temp
-#         docker run eranrund/muslrust:@${{ steps.build.outputs.digest }} rustc --version
-#         RUST_VER="$(docker run eranrund/muslrust:temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
-#         RUST_DATE="$(date +"%Y-%m-%d")"
-#         RUST_CHANNEL=nightly
-#         echo "TAG1=eranrund/muslrust:${RUST_CHANNEL}" >> $GITHUB_ENV
-#         echo "TAG2=eranrund/muslrust:${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
-#         echo "TAG3=eranrund/muslrust:${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
+    - name: Store rust version
+      shell: bash
+      run: |
+        docker run eranrund/muslrust:@${{ steps.build.outputs.digest }} rustc --version
+        RUST_VER="$(docker run eranrund/muslrust:@${{ steps.build.outputs.digest }} rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
+        echo $RUST_VER > /tmp/rust-version
+       
+    - name: Upload tags
+      uses: actions/upload-artifact@v4
+      with:
+        name: rust-version
+        path: /tmp/rust-version
+        if-no-files-found: error
+        retention-days: 1
+
 
 #     - name: Run tests
 #       shell: bash
@@ -120,6 +123,14 @@ jobs:
           path: /tmp/digests
           pattern: digests-*
           merge-multiple: true
+
+      -
+        name: Download rust version
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/rust-version
+          name: rust-version
+ 
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -139,9 +150,15 @@ jobs:
         name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:meh \
-            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)          
+          RUST_DATE="$(date +"%Y-%m-%d")"
+          RUST_CHANNEL=nightly
+
+          for tag in latest ${RUST_CHANNEL}${RUST_CHANNEL}-${RUST_DATE} $(cat /tmp/rust-version); do
+            docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:${tag} \
+              $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
+          done
+
       -
         name: Inspect image
         run: |
-          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:meh
+          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:latest
