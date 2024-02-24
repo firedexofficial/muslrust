@@ -74,11 +74,11 @@ ENV SSL_VER="1.1.1w" \
 # Set up a prefix for musl build libraries, make the linker's job of finding them easier
 # Primarily for the benefit of postgres.
 # Lastly, link some linux-headers for openssl 1.1 (not used herein)
-RUN mkdir $PREFIX && \
-    echo "$PREFIX/lib" >> /etc/ld-musl-aarch64.path && \
-    ln -s /usr/include/aarch64-linux-gnu/asm /usr/include/aarch64-linux-musl/asm && \
-    ln -s /usr/include/asm-generic /usr/include/aarch64-linux-musl/asm-generic && \
-    ln -s /usr/include/linux /usr/include/aarch64-linux-musl/linux
+# RUN mkdir $PREFIX && \
+#     echo "$PREFIX/lib" >> /etc/ld-musl-aarch64.path && \
+#     ln -s /usr/include/aarch64-linux-gnu/asm /usr/include/aarch64-linux-musl/asm && \
+#     ln -s /usr/include/asm-generic /usr/include/aarch64-linux-musl/asm-generic && \
+#     ln -s /usr/include/linux /usr/include/aarch64-linux-musl/linux
 
 # # Build zlib (used in openssl and pq)
 # RUN curl -sSL https://zlib.net/zlib-$ZLIB_VER.tar.gz | tar xz && \
