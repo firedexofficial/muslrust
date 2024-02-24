@@ -139,8 +139,7 @@ jobs:
         name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          echo "eh eh" $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+          docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:meh \
             $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)          
       -
         name: Inspect image
