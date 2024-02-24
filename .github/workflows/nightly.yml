@@ -53,6 +53,20 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+#     - name: Build nightly image
+#       id: build
+#       uses: docker/build-push-action@v2
+#       with:
+#         context: .
+#         platforms: ${{ matrix.platform }}
+#         labels: ${{ steps.meta.outputs.labels }}
+#         outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+#         file:  ${{ matrix.dockerfile }}
+#         push: false
+#         build-args: |
+#           CHANNEL=nightly
+#           #tags: eranrund/muslrust:temp
+#
     - name: Build nightly image
       id: build
       uses: docker/build-push-action@v2
@@ -60,12 +74,13 @@ jobs:
         context: .
         platforms: ${{ matrix.platform }}
         labels: ${{ steps.meta.outputs.labels }}
-        outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
         file:  ${{ matrix.dockerfile }}
         push: false
+        tags: rustmusl-temp
         build-args: |
           CHANNEL=nightly
           #tags: eranrund/muslrust:temp
+#
 
     - name: Export digest
       run: |
@@ -85,11 +100,11 @@ jobs:
     - name: Store rust version
       shell: bash
       run: |
-        docker run eranrund/muslrust@${{ steps.build.outputs.digest }} rustc --version
+        docker run rustmusl-temp rustc --version
         RUST_VER="$(docker run eranrund/muslrust@${{ steps.build.outputs.digest }} rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
         echo $RUST_VER > /tmp/rust-version
        
-    - name: Upload tags
+    - name: Upload rust version
       uses: actions/upload-artifact@v4
       with:
         name: rust-version
