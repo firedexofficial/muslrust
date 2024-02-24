@@ -19,9 +19,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
+        platform: [linux/amd64, arm64]
+        include:
+          - platform: linux/amd64
+            dockerfile: Dockerfile.x86_64
+          - platform: arm64
+            dockerfile: Dockerfile.arm64
     steps:
     - uses: 'actions/checkout@v2'
     - uses: extractions/setup-just@v1
@@ -57,6 +60,7 @@ jobs:
         platforms: ${{ matrix.platform }}
         labels: ${{ steps.meta.outputs.labels }}
         outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+        file:  ${{ matrix.dockerfile }}
         push: false
         build-args: |
           CHANNEL=nightly
