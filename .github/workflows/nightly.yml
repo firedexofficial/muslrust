@@ -110,8 +110,8 @@ jobs:
     - name: Tag and push
       shell: bash
       run: |
-        docker tag rustmusl-temp ${{ env.REGISTRY_NAME }}:${{ matrix.arch }}-latest
-        docker push ${{ env.REGISTRY_NAME }}:${{ matrix.arch }}-latest
+        docker tag rustmusl-temp ${{ env.REGISTRY_IMAGE }}:${{ matrix.arch }}-latest
+        docker push ${{ env.REGISTRY_IMAGE }}:${{ matrix.arch }}-latest
        
     - name: Upload rust version
       uses: actions/upload-artifact@v4
