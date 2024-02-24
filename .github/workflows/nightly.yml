@@ -100,7 +100,11 @@ jobs:
 #         if-no-files-found: error
 #         retention-days: 1
 
-    - name: Store tag info
+    # The date/channel/version are expected to be the same on both architectures and are needed for the merge step.
+    # We store them here since it makes the merge step a bit easier - it doesn't need to figure out which of the
+    # architectures it can run (to extract the rust version).
+    # Not the most elegant, but it works.
+     - name: Store tag info
       shell: bash
       run: |
         mkdir -p /tmp/tags
@@ -112,7 +116,7 @@ jobs:
         echo $RUST_CHANNEL > /tmp/tags/rust-channel
         echo $RUST_VER > /tmp/tags/rust-ver
 
-    - name: Tag and push
+   - name: Tag and push
       shell: bash
       run: |
         RUST_DATE=$(cat /tmp/tags/rust-date)
@@ -191,8 +195,7 @@ jobs:
           RUST_VER=$(cat /tmp/tags/rust-ver)
 
           docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:mehmeh \
-            amd64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}"
-            arm64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}"
+            ${{ env.REGISTRY_IMAGE }}:amd64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}" ${{ env.REGISTRY_IMAGE }}:arm64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}"
 
           #for tag in latest ${RUST_CHANNEL} ${RUST_CHANNEL}-${RUST_DATE} ${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}  do
           #  docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:${tag} \
