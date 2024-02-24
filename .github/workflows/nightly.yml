@@ -33,7 +33,7 @@ jobs:
       if: github.event_name != 'pull_request'
       uses: docker/login-action@v1
       with:
-        username: clux
+        username: eranrund
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Prepare
@@ -64,18 +64,18 @@ jobs:
         push: false
         build-args: |
           CHANNEL=nightly
-        tags: clux/muslrust:temp
+        tags: eranrund/muslrust:temp
 
     - name: Compute tags
       shell: bash
       run: |
-        docker run clux/muslrust:temp rustc --version
-        RUST_VER="$(docker run clux/muslrust:temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
+        docker run eranrund/muslrust:temp rustc --version
+        RUST_VER="$(docker run eranrund/muslrust:temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
         RUST_DATE="$(date +"%Y-%m-%d")"
         RUST_CHANNEL=nightly
-        echo "TAG1=clux/muslrust:${RUST_CHANNEL}" >> $GITHUB_ENV
-        echo "TAG2=clux/muslrust:${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
-        echo "TAG3=clux/muslrust:${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
+        echo "TAG1=eranrund/muslrust:${RUST_CHANNEL}" >> $GITHUB_ENV
+        echo "TAG2=eranrund/muslrust:${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
+        echo "TAG3=eranrund/muslrust:${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
 
     - name: Run tests
       shell: bash
@@ -88,4 +88,4 @@ jobs:
         build-args: |
           CHANNEL=nightly
         push: ${{ github.event_name != 'pull_request' }}
-        tags: clux/muslrust:latest,${{ env.TAG1 }},${{ env.TAG2 }},${{ env.TAG3 }}
+        tags: eranrund/muslrust:latest,${{ env.TAG1 }},${{ env.TAG2 }},${{ env.TAG3 }}
