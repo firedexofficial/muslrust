@@ -10,7 +10,7 @@ on:
       - 'main'
 
 env:
-  REGISTRY_IMAGE: user/app
+  REGISTRY_IMAGE: eranrund/muslrust
 
 jobs:
   docker:
@@ -65,6 +65,20 @@ jobs:
         build-args: |
           CHANNEL=nightly
         tags: eranrund/muslrust:temp
+
+    - name: Export digest
+      run: |
+        mkdir -p /tmp/digests
+        digest="${{ steps.build.outputs.digest }}"
+        echo "digest: $digest"
+        touch "/tmp/digests/${digest#sha256:}"
+    - name: Upload digest
+      uses: actions/upload-artifact@v4
+      with:
+        name: digests-${{ env.PLATFORM_PAIR }}
+        path: /tmp/digests/*
+        if-no-files-found: error
+        retention-days: 1
 
     - name: Compute tags
       shell: bash
