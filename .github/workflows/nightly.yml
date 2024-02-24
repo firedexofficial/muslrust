@@ -76,6 +76,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         file:  ${{ matrix.dockerfile }}
         push: false
+        load: true
         tags: rustmusl-temp
         build-args: |
           CHANNEL=nightly
