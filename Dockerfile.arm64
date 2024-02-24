@@ -71,9 +71,9 @@ RUN cd /tmp && \
     cp bin/protoc /usr/bin/protoc && \
     rm -rf *
 
-Set up a prefix for musl build libraries, make the linker's job of finding them easier
-Primarily for the benefit of postgres.
-Lastly, link some linux-headers for openssl 1.1 (not used herein)
+# Set up a prefix for musl build libraries, make the linker's job of finding them easier
+# Primarily for the benefit of postgres.
+# Lastly, link some linux-headers for openssl 1.1 (not used herein)
 RUN mkdir $PREFIX && \
     echo "$PREFIX/lib" >> /etc/ld-musl-aarch64.path && \
     ln -s /usr/include/aarch64-linux-gnu/asm /usr/include/aarch64-linux-musl/asm && \
