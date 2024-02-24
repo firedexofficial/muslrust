@@ -82,20 +82,20 @@ jobs:
           #tags: eranrund/muslrust:temp
 #
 
-    - name: Export digest
-      run: |
-        mkdir -p /tmp/digests
-        digest="${{ steps.build.outputs.digest }}"
-        echo "digest: $digest"
-        touch "/tmp/digests/${digest#sha256:}"
-
-    - name: Upload digest
-      uses: actions/upload-artifact@v4
-      with:
-        name: digests-${{ env.PLATFORM_PAIR }}
-        path: /tmp/digests/*
-        if-no-files-found: error
-        retention-days: 1
+#     - name: Export digest
+#       run: |
+#         mkdir -p /tmp/digests
+#         digest="${{ steps.build.outputs.digest }}"
+#         echo "digest: $digest"
+#         touch "/tmp/digests/${digest#sha256:}"
+# 
+#     - name: Upload digest
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: digests-${{ env.PLATFORM_PAIR }}
+#         path: /tmp/digests/*
+#         if-no-files-found: error
+#         retention-days: 1
 
     - name: Store rust version
       shell: bash
