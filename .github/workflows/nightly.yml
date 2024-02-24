@@ -86,7 +86,7 @@ jobs:
       shell: bash
       run: |
         #docker run eranrund/muslrust:temp rustc --version
-        docker run eranrund/muslrust@sha256:${{ steps.build.outputs.digest }} rustc --version
+        docker run eranrund/muslrust@${{ steps.build.outputs.digest }} rustc --version
         RUST_VER="$(docker run eranrund/muslrust:temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
         RUST_DATE="$(date +"%Y-%m-%d")"
         RUST_CHANNEL=nightly
