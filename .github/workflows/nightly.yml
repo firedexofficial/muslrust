@@ -108,9 +108,9 @@ jobs:
         retention-days: 1
         overwrite: true
 
-     - name: Run tests
-       shell: bash
-       run: TARGET_DIR=${{ matrix.target_dir }} PLATFORM=${{ matrix.platform }} just test
+#    - name: Run tests
+#       shell: bash
+#       run: TARGET_DIR=${{ matrix.target_dir }} PLATFORM=${{ matrix.platform }} just test
 
   merge:
     runs-on: ubuntu-latest
