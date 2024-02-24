@@ -60,7 +60,9 @@ jobs:
         context: .
         platforms: ${{ matrix.platform }}
         labels: ${{ steps.meta.outputs.labels }}
-        outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+        outputs: 
+          - type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          - type=image,name=musltemp,push=false
         file:  ${{ matrix.dockerfile }}
         push: false
         build-args: |
@@ -86,9 +88,8 @@ jobs:
       shell: bash
       run: |
         #docker run eranrund/muslrust:temp rustc --version
-        docker image tag eranrund/muslrust@${{ steps.build.outputs.digest }} eranrund/muslrust:temp
-        docker run eranrund/muslrust:temp rustc --version
-        RUST_VER="$(docker run eranrund/muslrust:temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
+        docker run musltemp rustc --version
+        RUST_VER="$(docker run musltemp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
         RUST_DATE="$(date +"%Y-%m-%d")"
         RUST_CHANNEL=nightly
         echo "TAG1=eranrund/muslrust:${RUST_CHANNEL}" >> $GITHUB_ENV
