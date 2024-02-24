@@ -116,7 +116,7 @@ jobs:
         echo $RUST_CHANNEL > /tmp/tags/rust-channel
         echo $RUST_VER > /tmp/tags/rust-ver
 
-   - name: Tag and push
+    - name: Tag and push
       shell: bash
       run: |
         RUST_DATE=$(cat /tmp/tags/rust-date)
