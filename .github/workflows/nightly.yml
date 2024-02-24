@@ -100,30 +100,35 @@ jobs:
 #         if-no-files-found: error
 #         retention-days: 1
 
-    - name: Store rust version
+    - name: Store tag info
       shell: bash
       run: |
-        docker run --platform ${{ matrix.platform }} rustmusl-temp rustc --version
+        mkdir -p /tmp/tags
+        RUST_DATE="$(date +"%Y-%m-%d")"
+        RUST_CHANNEL=nightly
         RUST_VER="$(docker run --platform ${{ matrix.platform }} rustmusl-temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
-        echo $RUST_VER > /tmp/rust-version
+
+        echo $RUST_DATE > /tmp/tags/rust-date
+        echo $RUST_CHANNEL > /tmp/tags/rust-channel
+        echo $RUST_VER > /tmp/tags/rust-ver
 
     - name: Tag and push
       shell: bash
       run: |
-        RUST_DATE="$(date +"%Y-%m-%d")"
-        RUST_CHANNEL=nightly
-        RUST_VER=$(cat /tmp/rust-version)
+        RUST_DATE=$(cat /tmp/tags/rust-date)
+        RUST_CHANNEL=$(cat /tmp/tags/rust-channel)
+        RUST_VER=$(cat /tmp/tags/rust-ver)
 
         TAG_NAME="${{ matrix.arch }}-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}"
 
         docker tag rustmusl-temp ${{ env.REGISTRY_IMAGE }}:$TAG_NAME
         docker push ${{ env.REGISTRY_IMAGE }}:$TAG_NAME
        
-    - name: Upload rust version
+    - name: Upload tags
       uses: actions/upload-artifact@v4
       with:
-        name: rust-version
-        path: /tmp/rust-version
+        name: tags
+        path: /tmp/tags
         if-no-files-found: error
         retention-days: 1
         overwrite: true
@@ -159,8 +164,8 @@ jobs:
         name: Download rust version
         uses: actions/download-artifact@v4
         with:
-          path: /tmp/rust-version
-          name: rust-version
+          path: /tmp/tags
+          name: tags
  
       -
         name: Set up Docker Buildx
@@ -181,9 +186,9 @@ jobs:
         name: Create manifest list and push multi-platform images
           #working-directory: /tmp/digests
         run: |
-          RUST_DATE="$(date +"%Y-%m-%d")"
-          RUST_CHANNEL=nightly
-          RUST_VER=$(cat /tmp/rust-version)
+          RUST_DATE=$(cat /tmp/tags/rust-date)
+          RUST_CHANNEL=$(cat /tmp/tags/rust-channel)
+          RUST_VER=$(cat /tmp/tags/rust-ver)
 
           docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:mehmeh \
             amd64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}"
