@@ -64,7 +64,7 @@ jobs:
         push: false
         build-args: |
           CHANNEL=nightly
-        tags: eranrund/muslrust:temp
+          #tags: eranrund/muslrust:temp
 
     - name: Export digest
       run: |
