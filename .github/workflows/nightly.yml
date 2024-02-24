@@ -194,13 +194,11 @@ jobs:
           RUST_CHANNEL=$(cat /tmp/tags/rust-channel)
           RUST_VER=$(cat /tmp/tags/rust-ver)
 
-          docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:mehmeh \
-            ${{ env.REGISTRY_IMAGE }}:amd64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE} ${{ env.REGISTRY_IMAGE }}:arm64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}
-
-          #for tag in latest ${RUST_CHANNEL} ${RUST_CHANNEL}-${RUST_DATE} ${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}  do
-          #  docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:${tag} \
-          #    $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)
-          #done
+          for tag in latest ${RUST_CHANNEL} ${RUST_CHANNEL}-${RUST_DATE} ${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}; do
+            docker buildx imagetools create -t ${{ env.REGISTRY_IMAGE }}:$tag \
+              ${{ env.REGISTRY_IMAGE }}:amd64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE} \
+              ${{ env.REGISTRY_IMAGE }}:arm64-${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}
+            done
 
       -
         name: Inspect image
