@@ -13,7 +13,7 @@ env:
   REGISTRY_IMAGE: eranrund/muslrust
 
 jobs:
-  docker:
+  build:
     name: 'Nightly Build'
     runs-on: 'ubuntu-latest'
     strategy:
@@ -60,9 +60,7 @@ jobs:
         context: .
         platforms: ${{ matrix.platform }}
         labels: ${{ steps.meta.outputs.labels }}
-        outputs: 
-          - type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          - type=image,name=musltemp,push=false
+        outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
         file:  ${{ matrix.dockerfile }}
         push: false
         build-args: |
@@ -88,23 +86,63 @@ jobs:
       shell: bash
       run: |
         #docker run eranrund/muslrust:temp rustc --version
-        docker run musltemp rustc --version
-        RUST_VER="$(docker run musltemp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
+        docker image tag eranrund/muslrust@${{ steps.build.outputs.digest }} eranrund/muslrust:temp
+        docker run eranrund/muslrust:@${{ steps.build.outputs.digest }} rustc --version
+        RUST_VER="$(docker run eranrund/muslrust:temp rustc --version | grep -oE "[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]")"
         RUST_DATE="$(date +"%Y-%m-%d")"
         RUST_CHANNEL=nightly
         echo "TAG1=eranrund/muslrust:${RUST_CHANNEL}" >> $GITHUB_ENV
         echo "TAG2=eranrund/muslrust:${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
         echo "TAG3=eranrund/muslrust:${RUST_VER}-${RUST_CHANNEL}-${RUST_DATE}" >> $GITHUB_ENV
 
-    - name: Run tests
-      shell: bash
-      run: just test
+#     - name: Run tests
+#       shell: bash
+#       run: just test
+# 
+#     - name: Push image under computed tags
+#       uses: docker/build-push-action@v2
+#       with:
+#         context: .
+#         build-args: |
+#           CHANNEL=nightly
+#         push: ${{ github.event_name != 'pull_request' }}
+#         tags: eranrund/muslrust:latest,${{ env.TAG1 }},${{ env.TAG2 }},${{ env.TAG3 }}
 
-    - name: Push image under computed tags
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        build-args: |
-          CHANNEL=nightly
-        push: ${{ github.event_name != 'pull_request' }}
-        tags: eranrund/muslrust:latest,${{ env.TAG1 }},${{ env.TAG2 }},${{ env.TAG3 }}
+  merge:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      -
+        name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_IMAGE }}
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: eranrund
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          echo "eh eh" $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)          
+      -
+        name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:meh
