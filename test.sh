@@ -19,9 +19,9 @@ docker_build() {
 
   docker run --rm \
     -v "$PWD:/volume" \
-    ubuntu:latest \
     -e RUST_BACKTRACE=1 \
     --platform $PLATFORM \
+    ubuntu:latest \
     bash -c "pwd; ls -la; find .; /volume/target/$TARGET_DIR/debug/${crate}"
     #/volume/target/$TARGET_DIR/debug/"${crate}"
 
