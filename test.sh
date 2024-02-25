@@ -2,7 +2,7 @@
 set -ex
 
 docker_build() {
-  echo "Arch: $ARCH"
+  echo "Target dir: $TARGET_DIR"
   echo "Platform: $PLATFORM"
 
   # NB: add -vv to cargo build when debugging
@@ -11,7 +11,7 @@ docker_build() {
     -v "$PWD/test/${crate}:/volume" \
     -v cargo-cache:/root/.cargo/registry \
     -e RUST_BACKTRACE=1 \
-    --platform $PLATFORM
+    --platform $PLATFORM \
     rustmusl-temp \
     cargo build
 
@@ -21,7 +21,7 @@ docker_build() {
     -v "$PWD:/volume" \
     -t ubuntu:latest
     --platform $PLATFORM \
-    /volume/target/$ARCH-unknown-linux-musl/debug/"${crate}"
+    /volume/target/$TARGET_DIR/debug/"${crate}"
 
   ldd "target/x86_64-unknown-linux-musl/debug/${crate}" 2>&1 | grep -qE "not a dynamic|statically linked" && \
     echo "${crate} is a static executable"
