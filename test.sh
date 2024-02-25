@@ -19,7 +19,8 @@ docker_build() {
 
   docker run --rm \
     -v "$PWD:/volume" \
-    ubuntu:latest
+    ubuntu:latest \
+    -e RUST_BACKTRACE=1 \
     --platform $PLATFORM \
     /volume/target/$TARGET_DIR/debug/"${crate}"
 
