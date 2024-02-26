@@ -49,6 +49,7 @@ jobs:
           echo '::set-output name=BUILD::YES'
         else
           echo "Stable tag found; skipping all build steps"
+          echo '::set-output name=BUILD::YES' # TODO
         fi
 
     - name: Prepare
@@ -140,7 +141,8 @@ jobs:
     needs:
       - build
     steps:
-    - name: Check if we need a new stable
+     - uses: 'actions/checkout@v2'
+     - name: Check if we need a new stable
       id: stablecheck
       shell: bash
       run: |
@@ -150,6 +152,7 @@ jobs:
           echo '::set-output name=BUILD::YES'
         else
           echo "Stable tag found; skipping all build steps"
+          echo '::set-output name=BUILD::YES' # TODO
         fi
 
     - name: Download tags
