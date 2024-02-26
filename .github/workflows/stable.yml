@@ -39,7 +39,7 @@ jobs:
         username: eranrund
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-   - name: Check if we need a new stable
+    - name: Check if we need a new stable
       id: stablecheck
       shell: bash
       run: |
