@@ -141,8 +141,8 @@ jobs:
     needs:
       - build
     steps:
-     - uses: 'actions/checkout@v2'
-     - name: Check if we need a new stable
+    - uses: 'actions/checkout@v2'
+    - name: Check if we need a new stable
       id: stablecheck
       shell: bash
       run: |
