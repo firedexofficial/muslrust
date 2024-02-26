@@ -17,12 +17,15 @@ docker_build() {
 
   cd "test/${crate}"
 
+  # Ideally we would use `ldd` but due to a qemu bug we can't :(
+  # See https://github.com/multiarch/qemu-user-static/issues/172
+  # Instead we use `file`.
   docker run --rm \
     -v "$PWD:/volume" \
     -e RUST_BACKTRACE=1 \
     --platform $PLATFORM \
     test-runner \
-    bash -c "cd volume; ls -la target; ./target/$TARGET_DIR/debug/${crate} && ldd ./target/$TARGET_DIR/debug/${crate} && ldd /volume/target/$TARGET_DIR/debug/${crate} 2>&1 | grep -qE 'not a dynamic|statically linked' && echo ${crate} is a static executable"
+    bash -c "cd volume; ./target/$TARGET_DIR/debug/${crate} && file ./target/$TARGET_DIR/debug/${crate} && file /volume/target/$TARGET_DIR/debug/${crate} 2>&1 | grep -qE 'statically linked' && echo ${crate} is a static executable"
 
 
   ldd "target/x86_64-unknown-linux-musl/debug/${crate}" 2>&1 | grep -qE "not a dynamic|statically linked" && \
