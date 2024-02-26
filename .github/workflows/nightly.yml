@@ -75,7 +75,7 @@ jobs:
       shell: bash
       run: |
         docker image ls
-        docker buildx build --platform ${{ matrix.platform }} -t test-runner - < Dockerfile.test-runner
+        docker buildx build --platform ${{ matrix.platform }} -o docker -t test-runner - < Dockerfile.test-runner
         docker image ls
         TARGET_DIR=${{ matrix.target_dir }} PLATFORM=${{ matrix.platform }} just test
 
