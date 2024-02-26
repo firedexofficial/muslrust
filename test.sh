@@ -11,6 +11,7 @@ docker_build() {
     -v "$PWD/test/${crate}:/volume" \
     -v cargo-cache:/root/.cargo/registry \
     -e RUST_BACKTRACE=1 \
+    -e AR=ar \
     --platform $PLATFORM \
     rustmusl-temp \
     cargo build
