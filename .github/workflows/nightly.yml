@@ -59,7 +59,7 @@ jobs:
 
     - name: Build nightly image
       id: build
-      uses: docker/build-push-action@v2 # TODO try v3
+      uses: docker/build-push-action@v3
       with:
         context: .
         platforms: ${{ matrix.platform }}
@@ -81,7 +81,9 @@ jobs:
 
     # The date/channel/version are expected to be the same on both architectures and are needed for the merge step.
     # We store them here since it makes the merge step a bit easier - it doesn't need to figure out which of the
-    # architectures it can run (to extract the rust version).
+    # architectures it can run (to extract the rust version). The problem is that it appears we can't run images
+    # that were built by docker buildx (the build-push-action step) locally. They get pushed to dockerhub but are
+    # only identifiable by their digest and it appears docker does not let us select an image that way.
     # Not the most elegant, but it works.
     - name: Store tag info
       shell: bash
@@ -146,7 +148,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
         name: Create manifest list and push multi-platform images
-          #working-directory: /tmp/digests
         run: |
           RUST_DATE=$(cat /tmp/tags/rust-date)
           RUST_CHANNEL=$(cat /tmp/tags/rust-channel)
