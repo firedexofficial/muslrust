@@ -74,7 +74,9 @@ jobs:
     - name: Run tests
       shell: bash
       run: |
+        docker image ls
         docker buildx build --platform ${{ matrix.platform }} -t test-runner - < Dockerfile.test-runner
+        docker image ls
         TARGET_DIR=${{ matrix.target_dir }} PLATFORM=${{ matrix.platform }} just test
 
     # The date/channel/version are expected to be the same on both architectures and are needed for the merge step.
